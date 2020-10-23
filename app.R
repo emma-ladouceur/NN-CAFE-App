@@ -6,21 +6,23 @@
 #
 #    http://shiny.rstudio.com/
 #
+library(rsconnect)
+rsconnect::deployApp()
 
-library(shiny); library(tidyverse); library(ggplot2); library(shinythemes); library(viridis); library(patchwork)
+library(shiny); library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork)
 
-site_dat <- read.csv("NN-CAFE-App/Data/Table_S1.csv")  
+site_dat <- read.csv("Data/Table_S1.csv")  
 
-load('NN-CAFE-App/Data/rich.mod.dat.Rdata')
-load('NN-CAFE-App/Data/bm.mod.dat.Rdata')
-load('NN-CAFE-App/Data/sgain_dat.Rdata')
-load('NN-CAFE-App/Data/sloss.n.mod.dat.Rdata')
-load('NN-CAFE-App/Data/sl.n.mod.dat.Rdata')
-load('NN-CAFE-App/Data/sg_dat.Rdata')
-load('NN-CAFE-App/Data/cde.mod.dat.Rdata')
-load('NN-CAFE-App/Data/study.p.effs.Rdata')
-load('NN-CAFE-App/Data/p.effs.Rdata')
-load('NN-CAFE-App/Data/study.price.p.effs.Rdata')
+load('Data/rich.mod.dat.Rdata')
+load('Data/bm.mod.dat.Rdata')
+load('Data/sgain_dat.Rdata')
+load('Data/sloss.n.mod.dat.Rdata')
+load('Data/sl.n.mod.dat.Rdata')
+load('Data/sg_dat.Rdata')
+load('Data/cde.mod.dat.Rdata')
+load('Data/study.p.effs.Rdata')
+load('Data/p.effs.Rdata')
+load('Data/study.price.p.effs.Rdata')
 
 
 
