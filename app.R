@@ -46,7 +46,7 @@ ui <- fixedPage(theme = shinytheme("readable"),
                       br(),
                       "Models are fitted linearly in a Bayesian hierarchical framework fit with a nested random effects structure of site, block and plot.",
                       br(), br(),
-                      "Each set of plots corresponds respectively to Figure 2, Figure 3, and Figure 4 in the main text, but visualises the  only the site level effects of each plot.",
+                      "Each set of plots corresponds respectively to Figure 2, Figure 3, and Figure 4 in the main text, but visualises the  only the site level estimated effects here.",
                       br(), br(),
                       "Figure captions for each set of plots written above each figure."
                ),
@@ -285,7 +285,7 @@ server <- function(input, output) {
               #                                 ymin = b.eff_lower, ymax = b.eff_upper),width=0,colour = "#0B775E", size = 2,alpha=0.9) +
               # geom_errorbarh(data = effs.p,aes(y=b.eff,
               #                                  xmin = r.eff_lower, xmax = r.eff_upper),height=0,colour = "#0B775E", size = 2, alpha=0.9) +
-              scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5), limits=c(-3.5,7.5)) +
+              scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5), limits=c(-5.5,7.5)) +
               scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200),limits=c(-200,200)) +
               labs(x = 'Rate of change in species richness (species/year)',
                    y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
@@ -345,7 +345,7 @@ server <- function(input, output) {
                              group = site_code), colour = "black", linetype = "dashed",
                          size = .7) +
             scale_x_continuous(breaks=c(1,3,6,9,12), limits=c(0,12)) +
-             ylim(-20,0) +
+            scale_y_continuous(breaks=c(0,-5,-10,-15,-20), limits=c(-20,10)) +
             labs(x = 'Year',
                  y = expression(paste('Species Loss')),  title= 'Species Loss') +
            # scale_color_viridis(discrete=FALSE,name="Length of Study") +
@@ -407,7 +407,7 @@ server <- function(input, output) {
                              group = site_code), colour = "black", linetype = "dashed",
                          size = .7) +
             scale_x_continuous(breaks=c(1,3,6,9,12),limits=c(0,12)) +
-            ylim(0,20) +
+            scale_y_continuous(breaks=c(0,5,10,15,20), limits=c(-10,20)) +
             labs(x = 'Year',
                  y = expression(paste('Species Gain')), title= 'Species Gain') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
