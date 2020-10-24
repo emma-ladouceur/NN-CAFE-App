@@ -81,9 +81,9 @@ ui <- fixedPage(theme = shinytheme("readable"),
                ),
                column(12,
                       br(),
-                      h2("Figure 4: All Together Now"),
+                      h2("Figure 4: Consider All Effects Together"),
                       br(),
-                      "The dashed reference line at 0 represents a slope of 0 for each metric. The  lines show the site level effect estimate of each response, added together to consider all components of change on communities for NPK treatments. ",
+                      "The dashed reference line at 0 represents a slope of 0 for each metric. The lines show the site level effect estimate of each response, added together to consider all components of change on communities for NPK treatments. Both y and x-axes are not fixed, and are allowed to vary between site visualisations for clarity.  ",
                       br(), br()),
                fixedRow(column(12, align = "center",
                                plotOutput('pricevectorviz', height = 500, width = 500),
@@ -231,40 +231,49 @@ server <- function(input, output) {
                                              ymin = 1400 ,ymax = 2000)
           
           
-          plot.rich_fitted.npk$Plot<-"Plot"
-          plot.rich_coef3$Site<-"Site"
+          plot.rich_fitted.ctl$Plot<-"Control Plot"
+          plot.rich_fitted.npk$Plot<-"NPK Plot"
           
-          r.leg<-ggplot() +
-              geom_point(data = plot.rich_fitted.npk %>% filter(site_code == input$selected_site),
-                         aes(x = year_trt, y = all.div, fill=Plot), alpha=0.2,
-                         size = .7, position = position_jitter(width = 0.45 )) +
-              geom_segment(data = plot.rich_coef3 %>% filter(site_code == input$selected_site) ,
+          
+          plot.rich_coef.ctl <- plot.rich_coef3
+          plot.rich_coef.ctl$Treatment<-"Control"
+          
+          
+          plot.rich_coef.npk <- plot.rich_coef3
+          plot.rich_coef.npk$Treatment<-"NPK"
+          
+          
+          r.leg<- ggplot()+
+              geom_point(data = plot.rich_fitted.npk %>% filter(site_code == input$selected_site) ,
+                         aes(x = year_trt, y = all.div,shape=Plot), #colour = "#0B775E",
+                         size = 1.3,alpha=0.5) +
+              geom_point(data = plot.rich_fitted.ctl %>% filter(site_code == input$selected_site) ,
+                         aes(x = year_trt, y = all.div,shape=Plot), # colour = "black",
+                         size = 1.3,  alpha=0.5) +
+              geom_segment(data = plot.rich_coef.npk %>% filter(site_code == input$selected_site) ,
                            aes(x = xmin, 
                                xend = xmax,
                                y = (Intercept + TE  + (ISlope+TESlope) * xmin),
                                yend =  (Intercept + TE + (ISlope+TESlope) * xmax),
-                               group = site_code, color=Site),
-                           alpha=0.2,size = .7) +
-              # # uncertainy in fixed effect
-              # geom_ribbon(data = plot.rich_fitted.npk,
-              #             aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              #             fill="#F98400",alpha = 0.5) +
-              # # fixed effect
-              # geom_line(data = fitted.rich,
-              #           aes(x = year_trt, y = Estimate, linetype= Treatment),
-              #           size = 1.5) +
-              # geom_ribbon(data = plot.rich_fitted.ctl,
-              #             aes(x = year_trt, ymin = Q2.5, ymax = Q97.5),
-              #             alpha = 0.5) +
-              scale_x_continuous(breaks=c(0,1,3,6,9,12)) +
-              labs(x='',
-                   #x = 'Years',
-                   y = ' Species richness', title= '', color='',fill='',linetype='') +
-              scale_fill_manual(values = c("black", drop =FALSE))+
-              scale_color_manual(values = c("black",drop =FALSE))+
+                               group = site_code,linetype=Treatment), #colour = "#0B775E",
+                           size = .7) +
+              geom_segment(data = plot.rich_coef.ctl %>% filter(site_code == input$selected_site) ,
+                           aes(x = xmin, 
+                               xend = xmax,
+                               y = (Intercept   + (ISlope) * xmin),
+                               yend =  (Intercept  + (ISlope) * xmax),
+                               group = site_code,linetype=Treatment), #colour = "black", linetype = "dashed",
+                           size = .7) +
+              ylim(0,40)+
+              scale_x_continuous(breaks=c(0,1,3,6,9,12),limits=c(0, 12)) +
+              scale_shape_manual(values=c(1,16))+
+              scale_linetype_manual(values=c("dashed", "solid"))+
+              labs(
+                  x = 'Year',
+                  y = ' Species richness', title= 'A) Species Richness') +
               theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
-                                 plot.title = element_text(size=12),
-                                 plot.margin= margin(t = 0.1, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),legend.spacing.x = unit(0.25, 'cm'))
+                                 plot.title = element_text(size=12))
+          
           
           
           study.rich.p2 <-study.rich.p %>% rename(r.eff=eff,r.eff_upper=eff_upper,r.eff_lower=eff_lower) 
@@ -304,7 +313,7 @@ server <- function(input, output) {
           rlegend<-g_legend(r.leg)
          
           
-          ( richviz | bmviz ) / ( rlegend ) / ( bef.q ) + plot_layout(heights = c(10,0.75,10))
+          ( richviz | bmviz ) / ( rlegend ) / ( bef.q ) + plot_layout(heights = c(10,1,10))
           
 
         
@@ -345,7 +354,7 @@ server <- function(input, output) {
                              group = site_code), colour = "black", linetype = "dashed",
                          size = .7) +
             scale_x_continuous(breaks=c(1,3,6,9,12), limits=c(0,12)) +
-            scale_y_continuous(breaks=c(0,-5,-10,-15,-20), limits=c(-20,10)) +
+            scale_y_continuous(breaks=c(0,-5,-10,-15,-20), limits=c(-20,0)) +
             labs(x = 'Year',
                  y = expression(paste('Species Loss')),  title= 'Species Loss') +
            # scale_color_viridis(discrete=FALSE,name="Length of Study") +
@@ -407,7 +416,7 @@ server <- function(input, output) {
                              group = site_code), colour = "black", linetype = "dashed",
                          size = .7) +
             scale_x_continuous(breaks=c(1,3,6,9,12),limits=c(0,12)) +
-            scale_y_continuous(breaks=c(0,5,10,15,20), limits=c(-10,20)) +
+            scale_y_continuous(breaks=c(0,5,10,15,20), limits=c(-2,20)) +
             labs(x = 'Year',
                  y = expression(paste('Species Gain')), title= 'Species Gain') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
@@ -643,41 +652,54 @@ server <- function(input, output) {
                                          ymin = 500, ymax = 1000)
         
         
-        sg.trt_fitted.npk$Plot<-"Pairwise Plot"
-        sg.trt_coef3$Site<-"Site"
         
-        p.leg<-ggplot()  +
-            # data
-            geom_point(data = sg.trt_fitted.npk,
-                       aes(x = year.y, y = SG, fill="Pairwise Plot"), alpha =0.2,
-                       size = .7, position = position_jitter(width = 0.45)) +
-            geom_segment(data = sg.trt_coef3,
+        sg.trt_fitted.ctl$Plot<-"Pairwise Control Plot"
+        sg.trt_fitted.npk$Plot<-"Pairwise NPK Plot"
+
+        
+        sg.trt_coef.ctl <- sg.trt_coef3
+        sg.trt_coef.ctl$Treatment<-"Control"
+        
+        
+        sg.trt_coef.npk <- sg.trt_coef3
+        sg.trt_coef.npk$Treatment<-"NPK"
+        
+        
+        p.leg <- ggplot()  +
+            geom_point(data = sg.trt_fitted.npk %>% filter(site_code == input$selected_site),
+                       aes(x = year.y, y = SG,shape=Plot), alpha=0.5,#color= "#046C9A",
+                       size = 1.3, alpha=0.7) +
+            geom_point(data = sg.trt_fitted.ctl %>% filter(site_code == input$selected_site),
+                       aes(x = year.y, y = SG,shape=Plot), alpha=0.5, #colour = "black",
+                       size = 1.3,  alpha=0.7) +
+            geom_segment(data = sg.trt_coef.npk %>% filter(site_code == input$selected_site),
                          aes(x = xs,
                              xend = xmax,
                              y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
-                             yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),color=Site),
-                         alpha=0.2,size = .7) +
-            # geom_ribbon(data = sg.trt_fitted.npk,
-            #             aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
-            #             fill="#046C9A",alpha = 0.5) +
-            # # fixed effect
-            # geom_line(data = fitted.sg,
-            #           aes(x = year.y, y = Estimate,linetype=Treatment),
-            #           size = 1.5) +
-            # geom_ribbon(data = sg.trt_fitted.ctl,
-            #             aes(x = year.y, ymin = Q2.5, ymax = Q97.5),
-            #             fill="black",alpha = 0.5) +
-            scale_x_continuous(breaks=c(1,3,6,9,12)) +
+                             yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
+                             linetype=Treatment ), #color= "#046C9A",
+                         size = .7) +
+            geom_segment(data = sg.trt_coef.ctl %>% filter(site_code == input$selected_site) ,
+                         aes(x = xmin, 
+                             xend = xmax,
+                             y = (Intercept   + (ISlope) * xmin),
+                             yend =  (Intercept  + (ISlope) * xmax),
+                             group = site_code,linetype=Treatment), #colour = "black", linetype = "dashed",
+                         size = .7) +
+            scale_x_continuous(breaks=c(1,3,6,9,12),limits=c(0,12)) +
             ylim(0,400) +
-            labs(x = 'Years',
-                 y='',
-                 title= '', color='',fill='',linetype='') +
-            scale_fill_manual(values = c("black", drop =FALSE))+
-            scale_color_manual(values = c("black",drop =FALSE))+
-            theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),
-                               legend.position="bottom", plot.margin= margin(t = -0.5, r = 0, b = 0.5, l = 0, unit = "cm"),
-                               legend.spacing.x = unit(0.25, 'cm'))
+            labs(x = 'Year',
+                 y = expression(paste('Change in Biomass (g/' ,m^2, ')')),  title= 'Biomass Change Due To Species Gain') +
+            scale_shape_manual(values=c(1,16))+
+            scale_linetype_manual(values=c("dashed", "solid"))+
+            theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
+                               #plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
+                               axis.title.x = element_text(size=9),
+                               axis.title.y = element_text(size=9),
+                               axis.text=element_text(size=9))
         
+        
+        p.leg
         
         #extract legend
         #https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
@@ -733,7 +755,55 @@ server <- function(input, output) {
                  # title= 'Rate of change / year '
                  title = '')
         
-        study.price.cloud
+        study.sloss.p$Vector="Losses"
+        study.sgain.p$Vector="Gains"
+        study.cde.p$Vector="Persistent Sp."
+        
+        
+        post.leg<-ggplot()+
+            geom_vline(xintercept = 0) + geom_hline(yintercept = 0) + theme_classic()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_rect(colour="black", fill="white"),legend.position="bottom")+
+            geom_segment(data = study.cde.p ,
+                         aes(x = 0,
+                             xend = 0,
+                             y = 0,
+                             yend = eff ,colour= Vector),
+                         size = 0.2,  alpha = 0.4,
+                         arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+            geom_segment(data = study.sloss.p ,
+                         aes(x = 0,
+                             xend = eff ,
+                             y = 0,
+                             yend = eff ,colour= Vector ),
+                         size = 0.2,  alpha = 0.4,
+                         arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+            geom_segment(data = study.sgain.p ,
+                         aes(x = 0,
+                             xend = eff ,
+                             y = 0,
+                             yend = eff ,
+                             colour= Vector), size = 0.2,  alpha = 0.4,
+                         arrow=arrow(type="closed",length=unit(0.1,"cm"))) +
+            scale_color_manual(name='Response',breaks=c("Losses","Gains","Persistent Sp."),
+                               values=c("Losses"="#B40F20","Gains"="#3B9AB2","Persistent Sp."="#F98400"))+
+            labs(x = 'Effect of NPK on Change in Species / Year',
+                 y = expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ')/ Year')),
+                 title= '')
+        
+        #extract legend
+        #https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggplot2-graphs
+        g_legend<-function(a.gplot){
+            tmp <- ggplot_gtable(ggplot_build(a.gplot))
+            leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+            legend <- tmp$grobs[[leg]]
+            return(legend)}
+        
+        p.legend<-g_legend(post.leg)
+        
+
+        
+        (study.price.cloud ) /  (p.legend) +  plot_layout(heights = c(10,1))
+        
+
         
     })
     
