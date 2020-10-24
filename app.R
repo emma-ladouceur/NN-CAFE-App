@@ -6,10 +6,8 @@
 #
 #    http://shiny.rstudio.com/
 #
-library(rsconnect)
-rsconnect::deployApp()
 
-library(shiny); library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork)
+library(shiny);  library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork)
 
 site_dat <- read.csv("Data/Table_S1.csv")  
 
