@@ -32,7 +32,7 @@ ui <- fixedPage(theme = shinytheme("readable"),
 
     fixedRow(
         column(12,
-               h1("Nutrient Network Site-Level Responses to NPK"),
+               h1("Nutrient Network Site-Level Responses to NPK Treatments"),
                br(),
                selectInput("selected_site", "Chosen Site", 
                            sitenames, selected = "ahth.is", multiple = FALSE,
@@ -42,7 +42,7 @@ ui <- fixedPage(theme = shinytheme("readable"),
         fixedRow(
                column(12,
                       br(), br(),
-                      h2("Linear Regressions: Site as a Random Effect"),
+                      h2("Site-Level Effects"),
                       br(),
                       "Models are fitted linearly in a Bayesian hierarchical framework fit with a nested random effects structure of site, block and plot.",
                       br(), br(),
@@ -93,7 +93,7 @@ ui <- fixedPage(theme = shinytheme("readable"),
                column(12,
                       br(), br(),
                       h2("Site Level Effect Sizes"),
-                      "Site level effect estimates and 95% credible intervals (CI’s) calculated from study level posterior distributions for each Treatment and Model. These correspond to visualisations for each figure above",
+                      "Site level effect estimates and 95% credible intervals (CI’s) calculated from study level posterior distributions for each Treatment and Model. These effect estimates correspond to visualisations for each figure above. The estimates reported here can be though of as a rate of change over time in terms of change/year.",
                       br(), br(),
                       tableOutput('resprange'),
                       br(), br()),
@@ -818,7 +818,8 @@ server <- function(input, output) {
     output$siteeffstable <- renderDT({
         
         site_effs <- p.all %>% filter(site_code == as.character(input$selected_site)) %>%
-            mutate_if(is.numeric,  round, 2) 
+            mutate_if(is.numeric,  round, 2) %>%
+            rename("Site Code" = "site_code")
         
         DT::datatable(site_effs,filter = "top",
                       options = list(pageLength = 14))
