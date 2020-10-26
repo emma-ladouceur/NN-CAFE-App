@@ -7,7 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
-library(shiny);  library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork)
+library(shiny);  library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork); library(DT)
 
 site_dat <- read.csv("Data/Table_S1.csv")  
 
@@ -21,7 +21,7 @@ load('Data/cde.mod.dat.Rdata')
 load('Data/study.p.effs.Rdata')
 load('Data/p.effs.Rdata')
 load('Data/study.price.p.effs.Rdata')
-
+load('Data/study.p.all.Rdata')
 
 
 sitenames <- as.character(unique(site_dat$site_code))
@@ -32,29 +32,29 @@ ui <- fixedPage(theme = shinytheme("readable"),
 
     fixedRow(
         column(12,
-               h1("Nutrient Network Site Response to NPK"),
+               h1("Nutrient Network Site-Level Responses to NPK"),
                br(),
                selectInput("selected_site", "Chosen Site", 
                            sitenames, selected = "ahth.is", multiple = FALSE,
                            selectize = TRUE, width = NULL, size = NULL),
-               h3(textOutput("sitename")),
+               h3(textOutput("sitename") ),
                
-   
+        fixedRow(
                column(12,
                       br(), br(),
                       h2("Linear Regressions: Site as a Random Effect"),
                       br(),
                       "Models are fitted linearly in a Bayesian hierarchical framework fit with a nested random effects structure of site, block and plot.",
                       br(), br(),
-                      "Each set of plots corresponds respectively to Figure 2, Figure 3, and Figure 4 in the main text, but visualises the  only the site level estimated effects here.",
+                      "Each set of plots corresponds respectively to Figure 2, Figure 3, and Figure 4 in the main text, but visualises only the site level estimated effects here.",
                       br(), br(),
-                      "Figure captions for each set of plots written above each figure."
+                      "Figure captions for each set of plots are written above each figure."
                ),
                column(12,
                       br(),
                       h2("Figure 2: Species Richness & Plot Biomass"),
                       br(),
-                      "In regressions represented in A) and B), each green point represents a plot treated with NPK and each grey open circle represents a control plot. Each green thin line represents the estimated NPK slope of every experimental site as a random effect and each think black dashed line represents the estimate slope of control plots.  The inset plots represent the site level slope of Control (black) and NPK (colored) treatments, error bars represent 95% credible intervals, and the dashed reference line at 0 represents a slope of 0 .",
+                      "In regressions represented in A) and B), each green point represents a plot treated with NPK and each grey open circle represents a control plot. Each green thin line represents the estimated NPK slope of every experimental site as a random effect and each black dashed line represents the estimated slope of control plots across time.  The inset plots represent the site level slope of Control (black) and NPK (colored) treatments, error bars represent 95% credible intervals, and the dashed reference line at 0 represents a slope of 0 .",
                       br(), br(),
                       "In C), each green point represents the slope for richness (x-axis) and biomass (y-axis) of an experimental site (n=58) treated with NPK, and error bars represent the 95% credible intervals for each site. The dashed reference line at 0 represents a slope of 0 for each metric.",
                       br(), br()),
@@ -90,11 +90,21 @@ ui <- fixedPage(theme = shinytheme("readable"),
                                br(), br(),
                )
                ),
-               
-               
+               column(12,
+                      br(), br(),
+                      h2("Site Level Effect Sizes"),
+                      "Site level effect estimates and 95% credible intervals (CI’s) calculated from study level posterior distributions for each Treatment and Model. These correspond to visualisations for each figure above",
+                      br(), br(),
+                      tableOutput('resprange'),
+                      br(), br()),
+               fluidRow(column(12), 
+                        DTOutput('siteeffstable') 
+            )
         )
     )
 )
+)
+
 
 # Define server logic required to draw a histogram
 server <- function(input, output) {
@@ -803,8 +813,15 @@ server <- function(input, output) {
         
         (study.price.cloud ) /  (p.legend) +  plot_layout(heights = c(10,1))
         
-
+    })
+    
+    output$siteeffstable <- renderDT({
         
+        site_effs <- p.all %>% filter(site_code == as.character(input$selected_site)) %>%
+            mutate_if(is.numeric,  round, 2) 
+        
+        DT::datatable(site_effs,filter = "top",
+                      options = list(pageLength = 14))
     })
     
     }

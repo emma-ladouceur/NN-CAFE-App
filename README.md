@@ -6,4 +6,4 @@ This is a shiny app to explore site level results looking ar Community Assembly 
 
 ## Author
 
-Emma Ladouceur
+Emma Ladouceur, inspired by colleague [Evan Batzer](https://www.evanbatzer.com/).
