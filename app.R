@@ -42,11 +42,11 @@ ui <- fixedPage(theme = shinytheme("readable"),
         fixedRow(
                column(12,
                       br(), br(),
-                      h2("Site-Level Effects"),
+                      h2("Site-Level Effect Estimates"),
                       br(),
                       "Models are fitted linearly in a Bayesian hierarchical framework fit with a nested random effects structure of site, block and plot.",
                       br(), br(),
-                      "Each set of plots corresponds respectively to Figure 2, Figure 3, and Figure 4 in the main text, but visualises only the site level estimated effects here.",
+                      "Each set of plots corresponds respectively to Figure 2, Figure 3, and Figure 4 in the main text, but visualises only the site-level estimated effects here.",
                       br(), br(),
                       "Figure captions for each set of plots are written above each figure."
                ),
@@ -54,7 +54,7 @@ ui <- fixedPage(theme = shinytheme("readable"),
                       br(),
                       h2("Figure 2: Species Richness & Plot Biomass"),
                       br(),
-                      "In regressions represented in A) and B), each green point represents a plot treated with NPK and each grey open circle represents a control plot. Each green thin line represents the estimated NPK slope of every experimental site as a random effect and each black dashed line represents the estimated slope of control plots across time.  The inset plots represent the site level slope of Control (black) and NPK (colored) treatments, error bars represent 95% credible intervals, and the dashed reference line at 0 represents a slope of 0 .",
+                      "In regressions represented in A) and B), each green point represents a plot treated with NPK and each grey open circle represents a control plot. Each green thin line represents the estimated NPK slope of every experimental site as a random effect and each black dashed line represents the estimated slope of control plots across time. The inset plots represent the site-level slope of Control (black) and NPK (colored) treatments, error bars represent 95% credible intervals, calculated from site-level posterior distributions, and the dashed reference line at 0 represents a slope of 0 .",
                       br(), br(),
                       "In C), each green point represents the slope for richness (x-axis) and biomass (y-axis) of an experimental site (n=58) treated with NPK, and error bars represent the 95% credible intervals for each site. The dashed reference line at 0 represents a slope of 0 for each metric.",
                       br(), br()),
@@ -67,7 +67,7 @@ ui <- fixedPage(theme = shinytheme("readable"),
                       br(),
                       h2("Figure 3: Species Loss, Species Gains, Persistent Species and the Effect of Each on Biomass Change Across Time"),
                       br(),
-                      "In regressions each colored solid point represents a pairwise comparison of a single plot before NPK nutrient addition (year 0) and for each year after treatment. Each grey open circle represents a pairwise comparison of a control plot at year 0 for each year measured after. Each colored thin solid line represents the estimated slope of NPK, and every black dashed line represents the estimate slope of control plots for every experimental site (n=58) as a random effect.  The inset plots represent the site level slope estimate of Control (black) and NPK (colored) treatments, error bars represent 95% credible intervals, and the dashed reference line at 0 represents a slope of 0 for each metric.",
+                      "In regressions each colored solid point represents a pairwise comparison of a single plot before NPK nutrient addition (year 0) and for each year after treatment. Each grey open circle represents a pairwise comparison of a control plot at year 0 for each year measured after. Each colored thin solid line represents the estimated slope of NPK, and every black dashed line represents the estimate slope of control plots for every experimental site (n=58) as a random effect.  The inset plots represent the site-level slope estimate of Control (black) and NPK (colored) treatments, error bars represent 95% credible intervals, calculated from site-level posterior distributions, and the dashed reference line at 0 represents a slope of 0 for each metric.",
                       br(), br()),
                fixedRow(column(12, align = "center",
                                plotOutput('slosssgainviz', height = 500, width = 800),
@@ -83,7 +83,7 @@ ui <- fixedPage(theme = shinytheme("readable"),
                       br(),
                       h2("Figure 4: Consider All Effects Together"),
                       br(),
-                      "The dashed reference line at 0 represents a slope of 0 for each metric. The lines show the site level effect estimate of each response, added together to consider all components of change on communities for NPK treatments. Both y and x-axes are not fixed, and are allowed to vary between site visualisations for clarity.  ",
+                      "The dashed reference line at 0 represents a slope of 0 for each metric. The lines show the site-level effect estimate of each response, added together to consider all components of change on communities for NPK treatments. Both y and x-axes are not fixed, and are allowed to vary between site visualisations for clarity.  ",
                       br(), br()),
                fixedRow(column(12, align = "center",
                                plotOutput('pricevectorviz', height = 500, width = 500),
@@ -92,8 +92,8 @@ ui <- fixedPage(theme = shinytheme("readable"),
                ),
                column(12,
                       br(), br(),
-                      h2("Site Level Effect Sizes"),
-                      "Site level effect estimates and 95% credible intervals (CI’s) calculated from study level posterior distributions for each Treatment and Model. These effect estimates correspond to visualisations for each figure above. The estimates reported here can be thought of as a rate of change over time in terms of change/year for every site. ",
+                      h2("Site-Level Effect Sizes"),
+                      "Site-level effect estimates and 95% credible intervals (CI’s) calculated from study level posterior distributions for each Treatment and Model. These effect estimates correspond to visualisations for each figure above. The estimates reported here can be thought of as a rate of change over time in terms of change/year for every site. ",
                       br(), br(),
                       tableOutput('resprange'),
                       br(), br()),
@@ -305,7 +305,7 @@ server <- function(input, output) {
               # geom_errorbarh(data = effs.p,aes(y=b.eff,
               #                                  xmin = r.eff_lower, xmax = r.eff_upper),height=0,colour = "#0B775E", size = 2, alpha=0.9) +
               scale_x_continuous(breaks=c(2.5,0,-2.5,-0.5), limits=c(-5.5,7.5)) +
-              scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200),limits=c(-200,200)) +
+              scale_y_continuous(breaks=c(200,100,25,0,-25,-100,-200,-250),limits=c(-250,200)) +
               labs(x = 'Rate of change in species richness (species/year)',
                    y = expression(paste('Rate of change in plot biomass (g/' ,m^2, '/year)')),
                    # title= 'Control Slope + NPK Slope'
@@ -363,8 +363,8 @@ server <- function(input, output) {
                              yend =  (Intercept  + (ISlope) * xmax),
                              group = site_code), colour = "black", linetype = "dashed",
                          size = .7) +
-            scale_x_continuous(breaks=c(1,3,6,9,12), limits=c(0,12)) +
-            scale_y_continuous(breaks=c(0,-5,-10,-15,-20), limits=c(-20,0)) +
+           scale_x_continuous(breaks=c(1,3,6,9,12), limits=c(0,12)) +
+            scale_y_continuous(breaks=c(0,-5,-10,-15,-20,-25), limits=c(-25,2)) +
             labs(x = 'Year',
                  y = expression(paste('Species Loss')),  title= 'Species Loss') +
            # scale_color_viridis(discrete=FALSE,name="Length of Study") +
@@ -395,7 +395,7 @@ server <- function(input, output) {
         
         
         slossviz <- sloss.r +  annotation_custom(ggplotGrob(sloss.eff),  xmin = 7, xmax = 12, 
-                                                 ymin = -20, ymax = -13)
+                                                 ymin = -25, ymax = -18)
         
         yr<-sgain.trt_coef3 %>% select(site_code,xmax)
         sgain.trt_fitted.npk <- sgain.trt_fitted.npk %>% left_join(yr)
@@ -426,7 +426,7 @@ server <- function(input, output) {
                              group = site_code), colour = "black", linetype = "dashed",
                          size = .7) +
             scale_x_continuous(breaks=c(1,3,6,9,12),limits=c(0,12)) +
-            scale_y_continuous(breaks=c(0,5,10,15,20), limits=c(-2,20)) +
+            scale_y_continuous(breaks=c(0,5,10,15,20,25), limits=c(-2,25)) +
             labs(x = 'Year',
                  y = expression(paste('Species Gain')), title= 'Species Gain') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
@@ -456,7 +456,7 @@ server <- function(input, output) {
         
         
         sgainviz <- sgain.r +  annotation_custom(ggplotGrob(sgain.eff), xmin = 7, xmax = 12, 
-                                                 ymin = 13, ymax = 20)
+                                                 ymin = 18, ymax = 25)
         
         
          (slossviz | sgainviz)
@@ -648,7 +648,7 @@ server <- function(input, output) {
                  #y= expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ') '))
                  y='') +
             geom_hline(yintercept = 0, lty = 2) +
-            scale_y_continuous(breaks=c(-8,0,4,14)) +
+           #scale_y_continuous(breaks=c(-8,0,4,14)) +
             scale_color_manual(values = c("#000000","#F98400")) +
             theme_bw(base_size=14)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
                                          plot.margin= margin(t = 0.2, r = 0.2, b = -0.2, l = -0.2, unit = "cm"),
