@@ -193,6 +193,7 @@ server <- function(input, output) {
         
         
            rich.r<- ggplot()+
+               geom_hline(yintercept = 0, lty = 2) +
                geom_point(data = plot.rich_fitted.ctl %>% filter(site_code == input$selected_site) ,
                           aes(x = year_trt, y = all.div),  colour =	"#C0C0C0",
                           size = 2,  alpha=0.5) +
@@ -255,6 +256,7 @@ server <- function(input, output) {
            plot.bm_fitted.ctl <- plot.bm_fitted.ctl %>% left_join(yr)
            
           bm.r <- ggplot() +
+              geom_hline(yintercept = 0, lty = 2) +
               geom_point(data = plot.bm_fitted.ctl %>% filter(site_code == input$selected_site) ,
                          aes(x = year_trt, y = plot.mass),  colour = "#C0C0C0",
                          size = 2,  alpha=0.7) +
@@ -411,6 +413,7 @@ server <- function(input, output) {
     
         
         sloss.r <- ggplot()  +
+            geom_hline(yintercept = 0, lty = 2) +
             geom_point(data = sloss.trt_fitted.ctl %>% filter(site_code == input$selected_site) ,
                        aes(x = year.y, y = s.loss.n), alpha=0.5, colour = "#C0C0C0",
                        size = 2,  alpha=0.7) +
@@ -476,6 +479,7 @@ server <- function(input, output) {
 
         
         sgain.r <- ggplot()  +
+            geom_hline(yintercept = 0, lty = 2) +
             geom_point(data = sgain.trt_fitted.ctl %>% filter(site_code == input$selected_site) ,
                        aes(x = year.y, y = s.gain),  colour = "#C0C0C0",
                        size =2,  alpha=0.7) +
@@ -552,6 +556,7 @@ server <- function(input, output) {
         
         
         sl.r <- ggplot()  +
+            geom_hline(yintercept = 0, lty = 2) +
             geom_point(data = sl.trt_fitted.ctl %>% filter(site_code == input$selected_site) ,
                        aes(x = year.y, y = SL),  colour = "#C0C0C0",
                        size = 2, alpha=0.7) +
@@ -620,6 +625,7 @@ server <- function(input, output) {
         
         
         sg.r <- ggplot()  +
+            geom_hline(yintercept = 0, lty = 2) +
             geom_point(data = sg.trt_fitted.ctl %>% filter(site_code == input$selected_site) ,
                        aes(x = year.y, y = SG),  colour = "#C0C0C0",
                        size = 2,  alpha=0.7) +
@@ -686,6 +692,7 @@ server <- function(input, output) {
         
         
         cde.r <- ggplot()  +
+            geom_hline(yintercept = 0, lty = 2) +
             geom_point(data = cde_fitted.ctl %>% filter(site_code == input$selected_site) ,
                        aes(x = year.y, y = CDE),  colour = "#C0C0C0",
                        size = 2, alpha=0.7) +
