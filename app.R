@@ -6,7 +6,7 @@
 # Updated: November 21, 2020
 
 # To deploy new version of app:
-# library(rsconnect)
+ #library(rsconnect)
 # deployApp()
 
 # Debugging:
@@ -84,7 +84,7 @@ ui <- fixedPage(theme = shinytheme("readable"),
                       br(),
                       h2("Figure 3: Species Loss, Species Gains, Persistent Species and the Effect of Each on Biomass Change Across Time"),
                       br(),
-                      "Plot levels measures are partitioned into 3 components in a temporal pairwise comparison. Each plot is compared to itself in time (Year 0 - Year n) to quantify; A) Species Loss, B) Species Gain, C) The effect of species loss on biomass change, D) The effect of species gain on biomass change, and E) Persistant species change in Biomass. In regressions A)-E) each colored point represents a pairwise comparison of a single plot before NPK nutrient addition (year 0) and for each year after treatment. Each grey grey point represents a pairwise comparison of a control plot at year 0 for each year measured after. Each colored  line represents the estimated slope of NPK, and each grey line represents the estimate slope of control plots for every experimental site (n=58) as a random effect.  The inset plots represent the site-level slope estimate of Control (grey) and NPK (colored) treatments, error bars represent 95% credible intervals, calculated from site-level posterior distributions, and the dashed reference line at 0 represents a slope of 0 for each metric.",
+                      "Plot-level measures are partitioned into 3 components in a temporal pairwise comparison. Each plot is compared to itself in time (Year 0 - Year n) to quantify; A) Species Loss, B) Species Gain, C) The effect of species loss on biomass change, D) The effect of species gain on biomass change, and E) Persistant species change in Biomass. In regressions A)-E) each colored point represents a pairwise comparison of a single plot before NPK nutrient addition (year 0) and for each year after treatment. Each grey grey point represents a pairwise comparison of a control plot at year 0 for each year measured after. Each colored  line represents the estimated slope of NPK, and each grey line represents the estimate slope of control plots for every experimental site (n=58) as a random effect.  The inset plots represent the site-level slope estimate of Control (grey) and NPK (colored) treatments, error bars represent 95% credible intervals, calculated from site-level posterior distributions, and the dashed reference line at 0 represents a slope of 0 for each metric.",
                       br(), br()),
                fixedRow(column(12, align = "center",
                                plotOutput('slosssgainviz', height = 500, width = 800),
@@ -133,7 +133,9 @@ server <- function(input, output) {
                                         "| Country:",
                                         unique(site_dat$country[site_dat$site_code == input$selected_site]),
                                         "| Habitat:",
-                                        unique(site_dat$habitat[site_dat$site_code == input$selected_site])))
+                                        unique(site_dat$habitat[site_dat$site_code == input$selected_site]),
+                                        "| Overall Response:",
+                                        unique(site_dat$Quadrant[site_dat$site_code == input$selected_site])))
     
     output$nnlocation <- renderPlot({
 
