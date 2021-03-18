@@ -57,7 +57,7 @@ ui <- fixedPage(theme = shinytheme("readable"),
                                           br(),
                                           h2("Species Richness & Biomass"),
                                           br(),
-                                          "Relationship between the mean plot level species richness and biomass from the starting point of each site before NPK treatment (year 0 - open circle) and in the most recent measurement in time since NPK treatment (arrow). Green arrow represents the selected site, and grey arrows represent all other sites included in this analyses.",
+                                          "Relationship between the mean plot level species richness and biomass from the starting point of each site before NPK treatment (year 0 - open circle) and in the most recent measurement in time (arrow). Green arrow represents the selected site, and grey arrows represent all other sites included in this analyses.",
                                    ),
                                # arrows
                                column(12,
@@ -198,7 +198,17 @@ server <- function(input, output) {
         
         
         ggplot() +
-            #selected site
+            #un-selected
+            geom_point(data=site_dat ,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
+            geom_point(data=site_dat ,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
+            geom_segment(data=site_dat , aes(x=rich.start,
+                                             xend=rich.end,
+                                             y=mass.start,
+                                             yend=mass.end,
+                                             group = site_code,
+            ),  color="black", alpha=0.2,
+            arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+            # selected site
             geom_point(data=site_dat %>% filter(site_code == input$selected_site) ,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
             geom_point(data=site_dat %>% filter(site_code == input$selected_site) ,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
             geom_segment(data=site_dat %>% filter(site_code == input$selected_site) ,aes(x=rich.start,
@@ -206,16 +216,6 @@ server <- function(input, output) {
                                            y=mass.start,
                                            yend=mass.end,
                                            group = site_code), color= "#0B775E" , size=1.5,
-                         arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
-            #un-selected
-            geom_point(data=site_dat ,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
-            geom_point(data=site_dat ,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
-            geom_segment(data=site_dat , aes(x=rich.start,
-                                            xend=rich.end,
-                                             y=mass.start,
-                                              yend=mass.end,
-                                               group = site_code,
-                                              ),  color="black", alpha=0.2,
                          arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
             labs(x = 'Species Richness',
                  y = expression(paste('Biomass (g/' ,m^2, ')')), 
