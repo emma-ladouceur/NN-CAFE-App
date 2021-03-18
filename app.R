@@ -6,14 +6,14 @@
 # Updated: November 21, 2020
 
 # To deploy new version of app:
- # library(rsconnect)
+  library(rsconnect)
 # deployApp()
 
 # Debugging:
 # rsconnect::showLogs(appName="nn-cafe-app",streaming=TRUE)
 
 # libraries
-library(shiny);  library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork); library(DT); library(sf); library(rnaturalearth); library(rnaturalearthdata); library(maps); library(rgeos)
+library(shiny);  library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork); library(DT); library(sf); library(rnaturalearth); library(rnaturalearthdata); library(maps); library(rgeos); library(viridis)
 
 # data
 site_dat <- read.csv("Data/Table_S1.csv")  
@@ -49,13 +49,22 @@ ui <- fixedPage(theme = shinytheme("readable"),
                            sitenames, selected = "ahth.is", multiple = FALSE,
                            selectize = TRUE, width = NULL, size = NULL),
                h3(textOutput("sitename") ),
-               
-               column(12,
+               # map
                fixedRow(column(12, align = "center",
                                plotOutput('nnlocation', height = 400, width = 1000),
-               )
-               )
-               ),
+                               fixedRow(
+                                   column(12,
+                                          br(),
+                                          h2("Species Richness & Biomass"),
+                                          br(),
+                                          "Relationship between the mean plot level species richness and biomass from the starting point of each site before NPK treatment (year 0 - open circle) and in the most recent measurement in time since NPK treatment (arrow). Green arrow represents the selected site, and grey arrows represent all other sites included in this analyses.",
+                                   ),
+                               # arrows
+                               column(12,
+                                      fixedRow(column(12, align = "center",
+                                                      plotOutput('richbmarrows', height = 400, width = 400),
+               )))
+               ))),
         fixedRow(
                column(12,
                       br(),
@@ -181,6 +190,41 @@ server <- function(input, output) {
         
         n
         
+        
+    })
+    
+    
+    output$richbmarrows <- renderPlot({
+        
+        
+        ggplot() +
+            #selected site
+            geom_point(data=site_dat %>% filter(site_code == input$selected_site) ,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
+            geom_point(data=site_dat %>% filter(site_code == input$selected_site) ,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
+            geom_segment(data=site_dat %>% filter(site_code == input$selected_site) ,aes(x=rich.start,
+                                           xend=rich.end,
+                                           y=mass.start,
+                                           yend=mass.end,
+                                           group = site_code), color= "#0B775E" , size=1.5,
+                         arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+            #un-selected
+            geom_point(data=site_dat ,aes(x=rich.start, y=mass.start),size=1.5, fill="white", shape=1) +
+            geom_point(data=site_dat ,aes(x=rich.end,y=mass.end),size=1.5, colour="white", shape=2) +
+            geom_segment(data=site_dat , aes(x=rich.start,
+                                            xend=rich.end,
+                                             y=mass.start,
+                                              yend=mass.end,
+                                               group = site_code,
+                                              ),  color="black", alpha=0.2,
+                         arrow=arrow(type="closed",length=unit(0.2,"cm"))) +
+            labs(x = 'Species Richness',
+                 y = expression(paste('Biomass (g/' ,m^2, ')')), 
+                 title= '') +
+            scale_y_continuous(limits=c(0,1500)) +
+            scale_x_continuous(limits=c(0,35)) +
+            theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
+                               strip.background = element_blank(),plot.title = element_text(size=12),
+                               legend.position="none")
         
     })
     
