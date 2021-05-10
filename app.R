@@ -3,10 +3,10 @@
 
 # Run the application by clicking the 'Run App' button above.
 # Author: Emma Ladouceur, emmala@gmail.com
-# Updated: November 21, 2020
+# Updated: May 10, 2021
 
 # To deploy new version of app:
-  library(rsconnect)
+#  library(rsconnect)
 # deployApp()
 
 # Debugging:
@@ -16,17 +16,17 @@
 library(shiny);  library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork); library(DT); library(sf); library(rnaturalearth); library(rnaturalearthdata); library(maps); library(rgeos); library(viridis)
 
 # data
-site_dat <- read.csv("Data/Table_S1.csv")  
-
-map.dat <- read.csv("Data/plot.csv")  
+site_dat <- read.csv("Data/Table_App.csv")  
+p.all <- read.csv("Data/nutnet_cumulative_time.csv")  
+map.dat <- read.csv("Data/Table_App.csv")  
 
 # data objects extracted from model objects
 load('Data/rich.mod.dat.Rdata')
 load('Data/bm.mod.dat.Rdata')
-load('Data/sgain_dat.Rdata')
+load('Data/sgain.mod.dat.Rdata')
 load('Data/sloss.n.mod.dat.Rdata')
 load('Data/sl.n.mod.dat.Rdata')
-load('Data/sg_dat.Rdata')
+load('Data/sg.mod.dat.Rdata')
 load('Data/cde.mod.dat.Rdata')
 load('Data/study.p.effs.Rdata')
 load('Data/p.effs.Rdata')
@@ -151,12 +151,12 @@ server <- function(input, output) {
         sitedat <- site_dat %>% 
             filter(site_code == input$selected_site) 
         
-        data <- map.dat %>% group_by(site_code) %>% filter(max.year >= 3) %>%
+        data <- map.dat %>% group_by(site_code) %>% filter(year_max >= 3) %>%
             ungroup()
         
-        data.f<- data %>% distinct( site_code, latitude, longitude, year_trt,continent) %>%
-            group_by(site_code, latitude, longitude, continent) %>%
-            summarise('Length of study' = max(year_trt)) %>% filter(!`Length of study` == 0) %>% droplevels()
+        data.f<- data %>% distinct( site_code, latitude, longitude, year_max,country) %>%
+            group_by(site_code, latitude, longitude, country) %>%
+            summarise('Length of study' = year_max) %>% filter(!`Length of study` == 0) %>% droplevels()
         
         world <- ne_countries(scale = "medium", returnclass = "sf")
         class(world)                 
@@ -233,7 +233,7 @@ server <- function(input, output) {
         sitedat <- site_dat %>% 
             filter(site_code == input$selected_site) 
         
-        yr<-plot.rich_coef3 %>% select(site_code,xmax)
+        yr<-plot.rich_coef2 %>% select(site_code,xmax)
         plot.rich_fitted.npk <- plot.rich_fitted.npk %>% left_join(yr)
         plot.rich_fitted.ctl <- plot.rich_fitted.ctl %>% left_join(yr)
         
@@ -241,19 +241,19 @@ server <- function(input, output) {
            rich.r<- ggplot()+
                geom_hline(yintercept = 0, lty = 2) +
                geom_point(data = plot.rich_fitted.ctl %>% filter(site_code == input$selected_site) ,
-                          aes(x = year_trt, y = all.div),  colour =	"#C0C0C0",
+                          aes(x = year_trt, y = rich),  colour =	"#C0C0C0",
                           size = 2,  alpha=0.5) +
                geom_point(data = plot.rich_fitted.npk %>% filter(site_code == input$selected_site) ,
-                          aes(x = year_trt, y = all.div), colour = "#0B775E",
+                          aes(x = year_trt, y = rich), colour = "#0B775E",
                           size = 2,alpha=0.5) +
-               geom_segment(data = plot.rich_coef3 %>% filter(site_code == input$selected_site) ,
+               geom_segment(data = plot.rich_coef2 %>% filter(site_code == input$selected_site) ,
                             aes(x = xmin, 
                                 xend = xmax,
                                 y = (Intercept   + (ISlope) * xmin),
                                 yend =  (Intercept  + (ISlope) * xmax),
                                 group = site_code), colour = "#C0C0C0", #linetype = "dashed",
                             size = 1) +
-               geom_segment(data = plot.rich_coef3 %>% filter(site_code == input$selected_site) ,
+               geom_segment(data = plot.rich_coef2 %>% filter(site_code == input$selected_site) ,
                             aes(x = xmin, 
                                 xend = xmax,
                                 y = (Intercept + TE  + (ISlope+TESlope) * xmin),
@@ -261,7 +261,7 @@ server <- function(input, output) {
                                 group = site_code), colour = "#0B775E",
                             size = 1) +
              ylim(0,40)+
-            scale_x_continuous(breaks=c(0,1,3,6,9,12),limits=c(0, 12)) +
+            scale_x_continuous(breaks=c(0,1,3,6,9,12,13),limits=c(0, 13)) +
             labs(
                 x = 'Year',
                 y = ' Species richness', title= 'A) Species Richness') +
@@ -297,26 +297,26 @@ server <- function(input, output) {
            richviz <- rich.r +  annotation_custom(ggplotGrob(rich.eff), xmin = 7, xmax = 12, 
                                            ymin = 28, ymax = 40)
            
-           yr<-plot.bm_coef3 %>% select(site_code,xmax)
+           yr<-plot.bm_coef2 %>% select(site_code,xmax)
            plot.bm_fitted.npk <- plot.bm_fitted.npk %>% left_join(yr)
            plot.bm_fitted.ctl <- plot.bm_fitted.ctl %>% left_join(yr)
            
           bm.r <- ggplot() +
               geom_hline(yintercept = 0, lty = 2) +
               geom_point(data = plot.bm_fitted.ctl %>% filter(site_code == input$selected_site) ,
-                         aes(x = year_trt, y = plot.mass),  colour = "#C0C0C0",
+                         aes(x = year_trt, y = strip.mass),  colour = "#C0C0C0",
                          size = 2,  alpha=0.7) +
               geom_point(data = plot.bm_fitted.npk %>% filter(site_code == input$selected_site),
-                         aes(x = year_trt, y = plot.mass), colour = "#0B775E",
+                         aes(x = year_trt, y = strip.mass), colour = "#0B775E",
                          size = 2,alpha=0.7) +
-              geom_segment(data = plot.bm_coef3 %>% filter(site_code == input$selected_site) ,
+              geom_segment(data = plot.bm_coef2 %>% filter(site_code == input$selected_site) ,
                            aes(x = xmin, 
                                xend = xmax,
                                y = (Intercept   + (ISlope) * xmin),
                                yend =  (Intercept  + (ISlope) * xmax),
                                group = site_code), colour = "#C0C0C0", #linetype = "dashed",
                            size = 1) +
-              geom_segment(data = plot.bm_coef3 %>% filter(site_code == input$selected_site),
+              geom_segment(data = plot.bm_coef2 %>% filter(site_code == input$selected_site),
                            aes(x = xmin, 
                                xend = xmax,
                                y = (Intercept + TE  + (ISlope+TESlope) * xmin),
@@ -328,7 +328,7 @@ server <- function(input, output) {
                     #x = 'Years',
                     y = expression(paste('Biomass (g/',m^2, ')')), title= 'B) Biomass') +
               ylim(-20,2000)+
-               scale_x_continuous(breaks=c(0,1,3,6,9,12),limits=c(0, 12)) +
+               scale_x_continuous(breaks=c(0,1,3,6,9,12,13),limits=c(0, 13)) +
                theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                   plot.title = element_text(size=14),
                                   axis.text.y = element_text(size=14),
@@ -365,10 +365,10 @@ server <- function(input, output) {
           plot.rich_fitted.ctl$Plot<-"Control"
           plot.rich_fitted.npk$Plot<-"NPK"
           
-          plot.rich_coef.ctl <- plot.rich_coef3
+          plot.rich_coef.ctl <- plot.rich_coef2
           plot.rich_coef.ctl$Slope<-"Control"
           
-          plot.rich_coef.npk <- plot.rich_coef3
+          plot.rich_coef.npk <- plot.rich_coef2
           plot.rich_coef.npk$Slope<-"NPK"
           
           
@@ -451,11 +451,11 @@ server <- function(input, output) {
         sitedat <- site_dat %>% 
             filter(site_code == input$selected_site) 
         
-        yr<-sloss.trt_coef3 %>% select(site_code,xmax)
+        yr<-sloss.trt_coef2 %>% select(site_code,xmax) %>% mutate(year.y = xmax)
         sloss.trt_fitted.npk <- sloss.trt_fitted.npk %>% left_join(yr)
         sloss.trt_fitted.ctl <- sloss.trt_fitted.ctl %>% left_join(yr)
         
-        sloss.trt_coef3$xs<-1
+        sloss.trt_coef2$xs<-1
     
         
         sloss.r <- ggplot()  +
@@ -466,24 +466,24 @@ server <- function(input, output) {
             geom_point(data = sloss.trt_fitted.npk %>% filter(site_code == input$selected_site),
                        aes(x = year.y, y = s.loss.n,),  alpha=0.5, color = "#B40F20",
                        size = 2, alpha=0.7) +
-            geom_segment(data = sloss.trt_coef3 %>% filter(site_code == input$selected_site) ,
+            geom_segment(data = sloss.trt_coef2 %>% filter(site_code == input$selected_site) ,
                          aes(x = xmin, 
                              xend = xmax,
                              y = (Intercept   + (ISlope) * xmin),
                              yend =  (Intercept  + (ISlope) * xmax),
                              group = site_code), colour = "#C0C0C0",# linetype = "dashed",
                          size = 1) +
-            geom_segment(data = sloss.trt_coef3 %>% filter(site_code == input$selected_site),
+            geom_segment(data = sloss.trt_coef2 %>% filter(site_code == input$selected_site),
                          aes(x = xs,
                              xend = xmax,
                              y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
                              yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
                          ),color = "#B40F20",
                          size = 1) +
-           scale_x_continuous(breaks=c(1,3,6,9,12), limits=c(0,12)) +
+           scale_x_continuous(breaks=c(1,3,6,9,12,13), limits=c(0,13)) +
             scale_y_continuous(breaks=c(0,-5,-10,-15,-20,-25), limits=c(-25,2)) +
             labs(x = 'Year',
-                 y = expression(paste('Species Loss')),  title= 'A) Species Loss') +
+                 y = expression(paste('Species loss')),  title= 'A) Species loss (s.loss)') +
            # scale_color_viridis(discrete=FALSE,name="Length of Study") +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                #plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
@@ -514,13 +514,13 @@ server <- function(input, output) {
                                          strip.background = element_blank(),legend.position="none")
         
         
-        slossviz <- sloss.r +  annotation_custom(ggplotGrob(sloss.eff),  xmin = 7, xmax = 12, 
+        slossviz <- sloss.r +  annotation_custom(ggplotGrob(sloss.eff),  xmin = 8, xmax = 13, 
                                                  ymin = -25, ymax = -18)
         
-        yr<-sgain.trt_coef3 %>% select(site_code,xmax)
+        yr<-sgain.trt_coef2 %>% select(site_code,xmax)
         sgain.trt_fitted.npk <- sgain.trt_fitted.npk %>% left_join(yr)
         sgain.trt_fitted.ctl <- sgain.trt_fitted.ctl %>% left_join(yr)
-        sgain.trt_coef3$xs<-1
+        sgain.trt_coef2$xs<-1
         
 
         
@@ -532,24 +532,24 @@ server <- function(input, output) {
             geom_point(data = sgain.trt_fitted.npk  %>% filter(site_code == input$selected_site),
                        aes(x = year.y, y = s.gain), color= "#046C9A",
                        size = 2,  alpha=0.7) +
-            geom_segment(data = sgain.trt_coef3 %>% filter(site_code == input$selected_site) ,
+            geom_segment(data = sgain.trt_coef2 %>% filter(site_code == input$selected_site) ,
                          aes(x = xmin, 
                              xend = xmax,
                              y = (Intercept   + (ISlope) * xmin),
                              yend =  (Intercept  + (ISlope) * xmax),
                              group = site_code), colour = "#C0C0C0",# linetype = "dashed",
                          size = 1) +
-            geom_segment(data = sgain.trt_coef3  %>% filter(site_code == input$selected_site),
+            geom_segment(data = sgain.trt_coef2  %>% filter(site_code == input$selected_site),
                          aes(x = xs,
                              xend = xmax,
                              y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
                              yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
                          ),color= "#046C9A",
                          size = 1) +
-            scale_x_continuous(breaks=c(1,3,6,9,12),limits=c(0,12)) +
+            scale_x_continuous(breaks=c(1,3,6,9,12,13),limits=c(0,13)) +
             scale_y_continuous(breaks=c(0,5,10,15,20,25), limits=c(-2,25)) +
             labs(x = 'Year',
-                 y = expression(paste('Species Gain')), title= 'B) Species Gain') +
+                 y = expression(paste('Species gain')), title= 'B) Species gain (s.gain)') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                # plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                                plot.title = element_text(size=14),
@@ -579,7 +579,7 @@ server <- function(input, output) {
                                          strip.background = element_blank(),legend.position="none")
         
         
-        sgainviz <- sgain.r +  annotation_custom(ggplotGrob(sgain.eff), xmin = 7, xmax = 12, 
+        sgainviz <- sgain.r +  annotation_custom(ggplotGrob(sgain.eff), xmin = 8, xmax = 13, 
                                                  ymin = 18, ymax = 25)
         
         
@@ -595,10 +595,10 @@ server <- function(input, output) {
             filter(site_code == input$selected_site) 
         
         #SL
-        yr<-sl.trt_coef3 %>% select(site_code,xmax)
+        yr<-sl.trt_coef2 %>% select(site_code,xmax)
         sl.trt_fitted.npk <- sl.trt_fitted.npk %>% left_join(yr)
         sl.trt_fitted.ctl <- sl.trt_fitted.ctl %>% left_join(yr)
-        sl.trt_coef3$xs<-1
+        sl.trt_coef2$xs<-1
         
         
         sl.r <- ggplot()  +
@@ -609,25 +609,25 @@ server <- function(input, output) {
             geom_point(data = sl.trt_fitted.npk %>% filter(site_code == input$selected_site),
                        aes(x = year.y, y = SL),  color = "#B40F20",
                        size = 2, alpha=0.7) +
-            geom_segment(data = sl.trt_coef3 %>% filter(site_code == input$selected_site) ,
+            geom_segment(data = sl.trt_coef2 %>% filter(site_code == input$selected_site) ,
                          aes(x = xmin, 
                              xend = xmax,
                              y = (Intercept   + (ISlope) * xmin),
                              yend =  (Intercept  + (ISlope) * xmax),
                              group = site_code), colour = "#C0C0C0", #linetype = "dashed",
                          size = 1) +
-            geom_segment(data = sl.trt_coef3 %>% filter(site_code == input$selected_site),
+            geom_segment(data = sl.trt_coef2 %>% filter(site_code == input$selected_site),
                          aes(x = xs,
                              xend = xmax,
                              y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
                              yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
                          ),color = "#B40F20",
                          size = 1) +
-             scale_x_continuous(breaks=c(1,3,6,9,12), limits=c(0,12)) +
-             ylim(-400,5) +
+             scale_x_continuous(breaks=c(1,3,6,9,12,13), limits=c(0,13)) +
+             ylim(-500,5) +
             labs(x = 'Year',
                  y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-                title= 'C) Biomass Change Due To Species Loss') +
+                title= 'C) Biomass change associated \n with species loss (SL)') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                # plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                                plot.title = element_text(size=14),
@@ -659,14 +659,14 @@ server <- function(input, output) {
                                          strip.background = element_blank(),legend.position="none")
         
         
-        slviz <- sl.r +  annotation_custom(ggplotGrob(sl.eff),  xmin = 7, xmax = 12, 
-                                           ymin = -400, ymax = -275)
+        slviz <- sl.r +  annotation_custom(ggplotGrob(sl.eff),  xmin = 0.5, xmax = 7, 
+                                           ymin = -500, ymax = -375)
         
         
-        yr<-sg.trt_coef3 %>% select(site_code,xmax)
+        yr<-sg.trt_coef2 %>% select(site_code,xmax)
         sg.trt_fitted.npk <- sg.trt_fitted.npk %>% left_join(yr)
         sg.trt_fitted.ctl <- sg.trt_fitted.ctl %>% left_join(yr) 
-        sg.trt_coef3$xs<-1
+        sg.trt_coef2$xs<-1
         
         
         
@@ -678,24 +678,24 @@ server <- function(input, output) {
             geom_point(data = sg.trt_fitted.npk %>% filter(site_code == input$selected_site),
                        aes(x = year.y, y = SG), color= "#046C9A",
                        size = 2, alpha=0.7) +
-            geom_segment(data = sg.trt_coef3 %>% filter(site_code == input$selected_site) ,
+            geom_segment(data = sg.trt_coef2 %>% filter(site_code == input$selected_site) ,
                          aes(x = xmin, 
                              xend = xmax,
                              y = (Intercept   + (ISlope) * xmin),
                              yend =  (Intercept  + (ISlope) * xmax),
                              group = site_code), colour = "#C0C0C0", #linetype = "dashed",
                          size = 1) +
-            geom_segment(data = sg.trt_coef3 %>% filter(site_code == input$selected_site),
+            geom_segment(data = sg.trt_coef2 %>% filter(site_code == input$selected_site),
                          aes(x = xs,
                              xend = xmax,
                              y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
                              yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
                          ), color= "#046C9A",
                          size = 1) +
-             scale_x_continuous(breaks=c(1,3,6,9,12),limits=c(0,12)) +
-             ylim(0,400) +
+             scale_x_continuous(breaks=c(1,3,6,9,12,13),limits=c(0,13)) +
+             ylim(-5,500) +
             labs(x = 'Year',
-                 y = expression(paste('Change in Biomass (g/' ,m^2, ')')),  title= 'D) Biomass Change Due To Species Gain') +
+                 y = expression(paste('Change in Biomass (g/' ,m^2, ')')),  title= 'D) Biomass change associated \n with species gain (SG)') +
            # scale_color_viridis(discrete=FALSE,name="Length of Study") +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                #plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
@@ -728,13 +728,13 @@ server <- function(input, output) {
                                          strip.background = element_blank(),legend.position="none")
         
         
-        sgviz <- sg.r +  annotation_custom(ggplotGrob(sg.eff),  xmin = 7, xmax = 12, 
-                                           ymin = 275, ymax = 400)
+        sgviz <- sg.r +  annotation_custom(ggplotGrob(sg.eff),  xmin = 7, xmax = 13.5, 
+                                           ymin = 375, ymax = 500)
         
-        yr<-cde_coef3 %>% select(site_code,xmax)
+        yr<-cde_coef2 %>% select(site_code,xmax)
         cde_fitted.npk <- cde_fitted.npk %>% left_join(yr)
         cde_fitted.ctl <- cde_fitted.ctl %>% left_join(yr)
-        cde_coef3$xs<-1
+        cde_coef2$xs<-1
         
         
         cde.r <- ggplot()  +
@@ -745,25 +745,25 @@ server <- function(input, output) {
             geom_point(data = cde_fitted.npk %>% filter(site_code == input$selected_site),
                        aes(x = year.y, y = CDE), color="#F98400",
                        size = 2,  alpha=0.7) +
-            geom_segment(data = cde_coef3 %>% filter(site_code == input$selected_site) ,
+            geom_segment(data = cde_coef2 %>% filter(site_code == input$selected_site) ,
                          aes(x = xmin, 
                              xend = xmax,
                              y = (Intercept   + (ISlope) * xmin),
                              yend =  (Intercept  + (ISlope) * xmax),
                              group = site_code), colour = "#C0C0C0", #linetype = "dashed",
                          size = 1) +
-            geom_segment(data = cde_coef3 %>% filter(site_code == input$selected_site),
+            geom_segment(data = cde_coef2 %>% filter(site_code == input$selected_site),
                          aes(x = xs,
                              xend = xmax,
                              y = (Intercept + TE + (ISlope+TESlope) *  cxmin),
                              yend = (Intercept + TE + (ISlope+TESlope)  * cxmax),
                          ), color="#F98400",
                          size = 1) +
-             scale_x_continuous(breaks=c(1,3,6,9,12),limits=c(0,12)) +
+             scale_x_continuous(breaks=c(1,3,6,9,12,13),limits=c(0,13)) +
              ylim(-500,1000) +
             labs(x = 'Year',
                  y = expression(paste('Change in Biomass (g/' ,m^2, ')')), 
-                title= 'E) Persistent Species Change in Biomass') +
+                title= 'E) Biomass change associated \n with persistent species (PS)') +
             theme_bw() + theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), strip.background = element_blank(),legend.position="bottom",
                                #plot.margin= margin(t = -0.5, r = 0.2, b = 0.5, l = 0.2, unit = "cm"),
                                plot.title = element_text(size=14),
@@ -794,15 +794,15 @@ server <- function(input, output) {
                                          strip.background = element_blank(),legend.position="none")
         
         
-        cdeviz <- cde.r +  annotation_custom(ggplotGrob(cde.eff), xmin = 7, xmax = 12, 
-                                         ymin = 500, ymax = 1000)
+        cdeviz <- cde.r +  annotation_custom(ggplotGrob(cde.eff), xmin = 7, xmax = 13, 
+                                         ymin = 500, ymax = 1100)
         
         
     # legend
-        sg.trt_coef.ctl <- sg.trt_coef3
-        sg.trt_coef.npk <- sg.trt_coef3
-        sl.trt_coef.npk <- sl.trt_coef3
-        cde.trt_coef.npk <- cde_coef3
+        sg.trt_coef.ctl <- sg.trt_coef2
+        sg.trt_coef.npk <- sg.trt_coef2
+        sl.trt_coef.npk <- sl.trt_coef2
+        cde.trt_coef.npk <- cde_coef2
         
         sg.trt_coef.ctl$Slope<-"Control"
         sl.trt_coef.npk$Slope="Losses"
@@ -1006,7 +1006,7 @@ server <- function(input, output) {
     
     output$siteeffstable <- renderDT({
         
-        site_effs <- p.all %>% filter(site_code == as.character(input$selected_site)) %>%
+        site_effs <- p.study.all %>% filter(site_code == as.character(input$selected_site)) %>%
             mutate_if(is.numeric,  round, 2) %>%
             rename("Site Code" = "site_code")
         
