@@ -6,7 +6,7 @@
 # Updated: May 10, 2021
 
 # To deploy new version of app:
-#  library(rsconnect)
+# library(rsconnect)
 # deployApp()
 
 # Debugging:
@@ -659,8 +659,8 @@ server <- function(input, output) {
                                          strip.background = element_blank(),legend.position="none")
         
         
-        slviz <- sl.r +  annotation_custom(ggplotGrob(sl.eff),  xmin = 0.5, xmax = 7, 
-                                           ymin = -500, ymax = -375)
+        slviz <- sl.r +  annotation_custom(ggplotGrob(sl.eff),  xmin = 0.5, xmax = 6.5, 
+                                           ymin = -500, ymax = -335)
         
         
         yr<-sg.trt_coef2 %>% select(site_code,xmax)
@@ -728,8 +728,8 @@ server <- function(input, output) {
                                          strip.background = element_blank(),legend.position="none")
         
         
-        sgviz <- sg.r +  annotation_custom(ggplotGrob(sg.eff),  xmin = 7, xmax = 13.5, 
-                                           ymin = 375, ymax = 500)
+        sgviz <- sg.r +  annotation_custom(ggplotGrob(sg.eff),  xmin = 7, xmax = 13, 
+                                           ymin = 335, ymax = 500)
         
         yr<-cde_coef2 %>% select(site_code,xmax)
         cde_fitted.npk <- cde_fitted.npk %>% left_join(yr)
@@ -795,7 +795,7 @@ server <- function(input, output) {
         
         
         cdeviz <- cde.r +  annotation_custom(ggplotGrob(cde.eff), xmin = 7, xmax = 13, 
-                                         ymin = 500, ymax = 1100)
+                                         ymin = 500, ymax = 1000)
         
         
     # legend
