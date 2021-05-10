@@ -6,7 +6,7 @@
 # Updated: May 10, 2021
 
 # To deploy new version of app:
-# library(rsconnect)
+#  library(rsconnect)
 # deployApp()
 
 # Debugging:
