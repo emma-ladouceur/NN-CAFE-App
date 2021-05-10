@@ -17,7 +17,6 @@ library(shiny);  library(tidyverse); library(ggplot2); library(shinythemes); lib
 
 # data
 site_dat <- read.csv("Data/Table_App.csv")  
-p.all <- read.csv("Data/nutnet_cumulative_time.csv")  
 map.dat <- read.csv("Data/Table_App.csv")  
 
 # data objects extracted from model objects
@@ -29,7 +28,6 @@ load('Data/sl.n.mod.dat.Rdata')
 load('Data/sg.mod.dat.Rdata')
 load('Data/cde.mod.dat.Rdata')
 load('Data/study.p.effs.Rdata')
-load('Data/p.effs.Rdata')
 load('Data/study.price.p.effs.Rdata')
 load('Data/study.p.all.Rdata')
 
