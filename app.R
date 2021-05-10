@@ -279,8 +279,7 @@ server <- function(input, output) {
                                                         ymax = eff_upper, color=response),
                              width = 0, size = 1) +
                labs(x = '',
-                    # y= expression(paste('Effect of NPK on Species Richness'))
-                    y='')+
+                    y='Slope')+
                geom_hline(yintercept = 0, lty = 2) +
                # scale_y_continuous(breaks=c(0,-0.5)) +
                scale_color_manual(values = c("#C0C0C0","#0B775E")) +
@@ -343,8 +342,7 @@ server <- function(input, output) {
                             width = 0, size = 1) +
               # facet_wrap(~Model)+
               labs(x = '',
-                   # y= expression(paste('Effect of NPK on Species bmness'))
-                   y='')+
+                   y='Slope')+
               geom_hline(yintercept = 0, lty = 2) +
                scale_y_continuous(breaks=c(0,30)) +
               scale_color_manual(values = c("#C0C0C0","#0B775E")) +
@@ -499,8 +497,7 @@ server <- function(input, output) {
                           width = 0, size = 1) +
             #facet_wrap(~Model)+
             labs(x = '',
-                 # y= expression(paste('Effect of NPK on Species Loss'))
-                 y='') +
+                 y='Slope') +
             geom_hline(yintercept = 0, lty = 2) +
             #scale_y_continuous(breaks=c(-0.5,-0.2,0)) +
             scale_color_manual(values = c("#C0C0C0","#B40F20")) +
@@ -564,8 +561,7 @@ server <- function(input, output) {
                           width = 0, size = 1) +
             # facet_wrap(~Model)+
             labs(x = '',
-                 # y= expression(paste('Effect of NPK on Species Gain'))
-                 y='') +
+                 y='Slope') +
             geom_hline(yintercept = 0, lty = 2) +
             #scale_y_continuous(breaks=c(0,0.05,0.3)) +
             scale_color_manual(values = c("#C0C0C0","#046C9A")) +
@@ -644,8 +640,7 @@ server <- function(input, output) {
                           width = 0, size = 1) +
             #facet_wrap(~Model)+
             labs(x = '',
-                 # y= expression(paste('Effect of NPK on Species Loss'))
-                 y='') +
+                 y='Slope') +
             geom_hline(yintercept = 0, lty = 2) +
             #scale_y_continuous(breaks=c(-0.5,-0.2,0)) +
             scale_color_manual(values = c("#C0C0C0","#B40F20")) +
@@ -713,8 +708,7 @@ server <- function(input, output) {
                           width = 0, size = 1) +
             # facet_wrap(~Model)+
             labs(x = '',
-                 # y= expression(paste('Effect of NPK on Species Gain'))
-                 y='') +
+                 y='Slope') +
             geom_hline(yintercept = 0, lty = 2) +
             #scale_y_continuous(breaks=c(0,0.05,0.3)) +
             scale_color_manual(values = c("#C0C0C0","#046C9A")) +
@@ -779,8 +773,7 @@ server <- function(input, output) {
                           width = 0, size = 1) +
             # facet_wrap(~Model)+
             labs(x = '',
-                 #y= expression(paste('Effect of NPK on Change in Biomass (g/' ,m^2, ') '))
-                 y='') +
+                 y='Slope') +
             geom_hline(yintercept = 0, lty = 2) +
            #scale_y_continuous(breaks=c(-8,0,4,14)) +
             scale_color_manual(values = c("#C0C0C0","#F98400")) +
