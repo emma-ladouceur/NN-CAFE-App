@@ -149,11 +149,11 @@ server <- function(input, output) {
         sitedat <- site_dat %>% 
             filter(site_code == input$selected_site) 
         
-        data <- map.dat %>% group_by(site_code) %>% filter(year_max >= 3) %>%
+        data <- map.dat  %>% group_by(site_code) %>% filter(year_max >= 3) %>%
             ungroup()
         
-        data.f<- data %>% distinct( site_code, latitude, longitude, year_max,country) %>%
-            group_by(site_code, latitude, longitude, country) %>%
+        data.f<- data %>% left_join(site_dat) %>% distinct( site_code, latitude, longitude, year_max,country, Quadrant) %>%
+            group_by(site_code, latitude, longitude, country, Quadrant) %>%
             summarise('Length of study' = year_max) %>% filter(!`Length of study` == 0) %>% droplevels()
         
         world <- ne_countries(scale = "medium", returnclass = "sf")
@@ -164,10 +164,13 @@ server <- function(input, output) {
         
         world <- map_data("world")
         
-        n <- data.f %>%  filter(site_code == input$selected_site) %>%
-            ggplot() +
+        
+        n <- ggplot() +
             geom_polygon(data = world, aes(x=long, y = lat, group = group), fill="grey", alpha=0.7) +
-            geom_point(aes(x=longitude, y=latitude,), color= "#0B775E" , size=8, alpha=0.5) +
+            #unselected
+            geom_point(data=data.f , aes(x=longitude, y=latitude), color="black", alpha=0.2, size = 3, shape=15) +
+            #selected
+            geom_point(data=data.f %>%  filter(site_code == input$selected_site) , aes(x=longitude, y=latitude), shape=16, color= "#0B775E" , size = 8, alpha=0.5) +
             coord_equal() +
             theme_void() +
             theme(
@@ -187,6 +190,30 @@ server <- function(input, output) {
             coord_equal() + theme(legend.position = "none")
         
         n
+        
+        # n <- data.f %>%  filter(site_code == input$selected_site) %>%
+        #     ggplot() +
+        #     geom_polygon(data = world, aes(x=long, y = lat, group = group), fill="grey", alpha=0.7) +
+        #     geom_point(aes(x=longitude, y=latitude,), color= "#0B775E" , size=8, alpha=0.5) +
+        #     coord_equal() +
+        #     theme_void() +
+        #     theme(
+        #         panel.spacing=unit(c(0,0,0,0), "null"),
+        #         plot.margin=grid::unit(c(1,1,1,1), "cm"),
+        #         legend.position=c(0.13,0.001),
+        #         legend.direction="horizontal"
+        #     ) +
+        #     ggplot2::annotate("text", x = -181, y = -44, hjust = 0, size = 8, label = paste("Site Location"), color = "black", alpha = 0.8) +
+        #     geom_text(data= data.f %>% filter(site_code == input$selected_site),
+        #               aes(x=-181, y=-54,
+        #                   label=paste('Length of Study = ', `Length of study`, 'Years')),
+        #               hjust = 0, size=6, color="black", alpha=0.5) +
+        #     xlim(-180,180) +
+        #     ylim(-60,80) +
+        #     scale_x_continuous(expand = c(0.006, 0.006)) +
+        #     coord_equal() + theme(legend.position = "none")
+        # 
+        # n
         
         
     })
