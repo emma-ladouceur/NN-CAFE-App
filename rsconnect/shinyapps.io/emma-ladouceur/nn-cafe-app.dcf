@@ -5,6 +5,7 @@ account: emma-ladouceur
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3081530
-bundleId: 4579607
+bundleId: 4627221
 url: https://emma-ladouceur.shinyapps.io/nn-cafe-app/
-when: 1620628675.96556
+when: 1621675152.77855
+lastSyncTime: 1621675152.77859
