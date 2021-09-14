@@ -3,11 +3,13 @@
 
 # Run the application by clicking the 'Run App' button above.
 # Author: Emma Ladouceur, emmala@gmail.com
-# Updated: May 10, 2021
+# Updated: September 14, 2021
 
 # To deploy new version of app:
 library(rsconnect)
-deployApp()
+# run following only first time on a new puter or whatever
+#rsconnect::setAccountInfo(name='emma-ladouceur', token='2CDF401E18B15F600B0B856F5735A48F', secret='mjWVaw7tRolQkRIGQw7uZdgc+U+d2ZI1ZU3BTUIg')
+#deployApp()
 
 # Debugging:
  #rsconnect::showLogs(appName="nn-cafe-app",streaming=TRUE)
