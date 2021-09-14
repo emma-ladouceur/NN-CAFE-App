@@ -6,14 +6,14 @@
 # Updated: May 10, 2021
 
 # To deploy new version of app:
-# library(rsconnect)
-# deployApp()
+library(rsconnect)
+deployApp()
 
 # Debugging:
-# rsconnect::showLogs(appName="nn-cafe-app",streaming=TRUE)
+ #rsconnect::showLogs(appName="nn-cafe-app",streaming=TRUE)
 
 # libraries
-library(shiny);  library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork); library(DT); library(sf); library(rnaturalearth); library(rnaturalearthdata); library(maps); library(rgeos); library(viridis)
+library(shiny); library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork); library(DT); library(sf); library(rnaturalearth); library(rnaturalearthdata); library(maps); library(rgeos); library(viridis)
 
 # data
 site_dat <- read.csv("Data/Table_App.csv")  
