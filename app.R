@@ -7,12 +7,12 @@
 
 # To deploy new version of app:
 library(rsconnect)
-# run following only first time on a new puter or whatever
-#rsconnect::setAccountInfo(name='emma-ladouceur', token='2CDF401E18B15F600B0B856F5735A48F', secret='mjWVaw7tRolQkRIGQw7uZdgc+U+d2ZI1ZU3BTUIg')
-#deployApp()
+# run following only in console, NOT HERE
+# rsconnect::setAccountInfo(name='emma-ladouceur', token='2CDF401E18B15F600B0B856F5735A48F', secret='mjWVaw7tRolQkRIGQw7uZdgc+U+d2ZI1ZU3BTUIg')
+# deployApp()
 
 # Debugging:
- #rsconnect::showLogs(appName="nn-cafe-app",streaming=TRUE)
+ # rsconnect::showLogs(appName="nn-cafe-app",streaming=TRUE)
 
 # libraries
 library(shiny); library(tidyverse); library(ggplot2); library(shinythemes); library(patchwork); library(DT); library(sf); library(rnaturalearth); library(rnaturalearthdata); library(maps); library(rgeos); library(viridis)
